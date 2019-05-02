@@ -1,4 +1,4 @@
-import React, { useReducer, useRef, useEffect } from 'react'; // 03: import useEffect
+import React, { useReducer, useRef, useEffect } from 'react';
 import { render } from 'react-dom';
 
 import './style.css';
@@ -18,13 +18,16 @@ const todosReducer = (state, action) => {
         }]
         : state
     }
-    // 06: add case for toggleComplete
     case 'TOGGLE_COMPLETE': {
       return state.map((item) =>
         item.id === action.id
           ? { ...item, complete: !item.complete }
           : item
       )
+    }
+    // 03: add case for deleteComplete
+    case 'DELETE_TODO': {
+      return state.filter((x) => x.id !== action.id);
     }
     default: {
       return state;
@@ -37,11 +40,11 @@ const Todo = () => {
   const [todos, dispatch] = useReducer(todosReducer, initialState);
   const completedTodos = todos.filter(
     (todo) => { return todo.complete }
-  ); // 01: filter todos, so that we can use it's count
+  );
 
   useEffect(() => {
     document.title = `You have ${completedTodos.length} items completed!`;
-  }) // 02: update document.title (excuse to show off another hook)
+  })
 
   function addTodo(event) {
     event.preventDefault();
@@ -54,7 +57,10 @@ const Todo = () => {
   }
   function toggleComplete(id) {
     dispatch({ type: 'TOGGLE_COMPLETE', id });
-  } // 05: add dispatch function for toggleComplete
+  }
+  function deleteTodo(id) {
+    dispatch({ type: 'DELETE_TODO', id });
+  } // 02: add dispatch function for deleteTodo
 
   return (
     <>
@@ -65,15 +71,18 @@ const Todo = () => {
       </div>
       <div className="column-container">
         {todos.map((todo) => (
-          <div 
+          <div
             className={`column-item ${todo.complete ? 'completed' : null}`}
             key={todo.id}
-          >{/* 06: add class 'completed' if todo.complete */}
+          >
             <div className="flex-container">
-              {/* 04: add onClick call to toggleComplete */}
-              <div className="todo-name" onClick={() => toggleComplete(todo.id)}
-              >{todo.name}</div>
-              <div className="todo-delete">&times;</div>
+              <div className="todo-name" onClick={() => toggleComplete(todo.id)}>
+                {todo.name}
+              </div>
+              {/* 01: Add onClick call to deleteTodo */}
+              <div className="todo-delete" onClick={() => deleteTodo(todo.id)}>
+                &times;
+              </div>
             </div>
           </div>
         ))}
