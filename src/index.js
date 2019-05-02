@@ -1,4 +1,4 @@
-import React, { useReducer, useRef } from 'react'; // 00: add imports
+import React, { useReducer, useRef, useEffect } from 'react'; // 03: import useEffect
 import { render } from 'react-dom';
 
 import './style.css';
@@ -18,17 +18,31 @@ const todosReducer = (state, action) => {
         }]
         : state
     }
+    // 06: add case for toggleComplete
+    case 'TOGGLE_COMPLETE': {
+      return state.map((item) =>
+        item.id === action.id
+          ? { ...item, complete: !item.complete }
+          : item
+      )
+    }
     default: {
       return state;
     }
   }
-} // 02: add reducer function and switch statement
+}
 
 const Todo = () => {
-  const inputRef = useRef(); // 04: add useRef hook (imperative way of using a ref)
-  const [todos, dispatch] = useReducer(todosReducer, initialState); // 01: add useReducer
+  const inputRef = useRef();
+  const [todos, dispatch] = useReducer(todosReducer, initialState);
+  const completedTodos = todos.filter(
+    (todo) => { return todo.complete }
+  ); // 01: filter todos, so that we can use it's count
 
-  // 05: add dispatch function for addTodo!
+  useEffect(() => {
+    document.title = `You have ${completedTodos.length} items completed!`;
+  }) // 02: update document.title (excuse to show off another hook)
+
   function addTodo(event) {
     event.preventDefault();
     dispatch({
@@ -38,21 +52,27 @@ const Todo = () => {
     });
     inputRef.current.value = '';
   }
+  function toggleComplete(id) {
+    dispatch({ type: 'TOGGLE_COMPLETE', id });
+  } // 05: add dispatch function for toggleComplete
 
   return (
     <>
-      { /* 03: add inputRef */}
       <div className="todo-input">
         <form onSubmit={addTodo}>
           <input ref={inputRef} type="search" id="add-todo" placeholder="Add Todo..." />
         </form>
       </div>
       <div className="column-container">
-        { /* 06: Change initalState to todos */}
         {todos.map((todo) => (
-          <div key={todo.id} alt={todo.id} className="column-item">
+          <div 
+            className={`column-item ${todo.complete ? 'completed' : null}`}
+            key={todo.id}
+          >{/* 06: add class 'completed' if todo.complete */}
             <div className="flex-container">
-              <div className="todo-name">{todo.name}</div>
+              {/* 04: add onClick call to toggleComplete */}
+              <div className="todo-name" onClick={() => toggleComplete(todo.id)}
+              >{todo.name}</div>
               <div className="todo-delete">&times;</div>
             </div>
           </div>
