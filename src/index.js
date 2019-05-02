@@ -25,9 +25,12 @@ const todosReducer = (state, action) => {
           : item
       )
     }
-    // 03: add case for deleteComplete
     case 'DELETE_TODO': {
       return state.filter((x) => x.id !== action.id);
+    }
+    // 03: add case for clearComplete
+    case 'CLEAR_TODOS': {
+      return [];
     }
     default: {
       return state;
@@ -60,7 +63,10 @@ const Todo = () => {
   }
   function deleteTodo(id) {
     dispatch({ type: 'DELETE_TODO', id });
-  } // 02: add dispatch function for deleteTodo
+  }
+  function clearTodos() {
+    dispatch({ type: 'CLEAR_TODOS' });
+  } // 02: add dispatch function for clearTodo
 
   return (
     <>
@@ -79,7 +85,6 @@ const Todo = () => {
               <div className="todo-name" onClick={() => toggleComplete(todo.id)}>
                 {todo.name}
               </div>
-              {/* 01: Add onClick call to deleteTodo */}
               <div className="todo-delete" onClick={() => deleteTodo(todo.id)}>
                 &times;
               </div>
@@ -87,7 +92,8 @@ const Todo = () => {
           </div>
         ))}
       </div>
-      <button>
+      {/* 01: Add onClick call to clearTodo */}
+      <button onClick={() => clearTodos()}>
         CLEAR TODOS
       </button>
     </>
