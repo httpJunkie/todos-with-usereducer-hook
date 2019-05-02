@@ -3,40 +3,9 @@ import { render } from 'react-dom';
 
 import './style.css';
 import * as constants from './constants';
+import todosReducer from './todosReducer';
 
 const initialState = [...constants.TODOS];
-const todosReducer = (state, action) => {
-  switch (action.type) {
-    case 'ADD_TODO': {
-      return (action.name.length)
-        ? [...state, {
-          id: state.length
-            ? Math.max(...state.map(todo => todo.id)) + 1
-            : 0,
-          name: action.name,
-          complete: false
-        }]
-        : state
-    }
-    case 'TOGGLE_COMPLETE': {
-      return state.map((item) =>
-        item.id === action.id
-          ? { ...item, complete: !item.complete }
-          : item
-      )
-    }
-    case 'DELETE_TODO': {
-      return state.filter((x) => x.id !== action.id);
-    }
-    // 03: add case for clearComplete
-    case 'CLEAR_TODOS': {
-      return [];
-    }
-    default: {
-      return state;
-    }
-  }
-}
 
 const Todo = () => {
   const inputRef = useRef();
@@ -49,7 +18,7 @@ const Todo = () => {
     document.title = `You have ${completedTodos.length} items completed!`;
   })
 
-  function addTodo(event) {
+  const addTodo = (event) => {
     event.preventDefault();
     dispatch({
       type: 'ADD_TODO',
@@ -58,15 +27,15 @@ const Todo = () => {
     });
     inputRef.current.value = '';
   }
-  function toggleComplete(id) {
+  const toggleComplete = (id) => {
     dispatch({ type: 'TOGGLE_COMPLETE', id });
   }
-  function deleteTodo(id) {
+  const deleteTodo = (id) => {
     dispatch({ type: 'DELETE_TODO', id });
   }
-  function clearTodos() {
+  const clearTodos = () => {
     dispatch({ type: 'CLEAR_TODOS' });
-  } // 02: add dispatch function for clearTodo
+  }
 
   return (
     <>
@@ -92,7 +61,6 @@ const Todo = () => {
           </div>
         ))}
       </div>
-      {/* 01: Add onClick call to clearTodo */}
       <button onClick={() => clearTodos()}>
         CLEAR TODOS
       </button>
